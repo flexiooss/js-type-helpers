@@ -7,7 +7,8 @@
   "author": "Thomas Chatelain (https://github.com/TomAchT)",
   "license": "Apache-2.0",
   "dependencies": {
-    "@flexio-oss/assert": "0.0.0"
+    "@flexio-oss/assert": "0.0.0",
+    "@flexio-oss/js-generator-helpers": "0.0.0"
   },
   "devDependencies": {
     "eslint": "^5.13.0",
