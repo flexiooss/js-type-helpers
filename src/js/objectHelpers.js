@@ -4,6 +4,7 @@ import {
   isUndefined,
   isArray
 } from '@flexio-oss/assert'
+import {isNull} from '../../../assert'
 
 /**
  *
@@ -146,6 +147,10 @@ export const deepMerge = (target, source) => {
  * @returns {*}
  */
 export const valueFor = (object, path, defaultValue = null) => {
+  if (isNull(object)) {
+    return defaultValue
+  }
+  
   assertType(
     isObject(object),
     'valueFor: `object` should be an Object'
