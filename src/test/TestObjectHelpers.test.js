@@ -2,7 +2,7 @@ import {TestCase} from 'code-altimeter-js'
 import {
   filterObject, hasProperties,
   maxKey,
-  sortObject
+  sortObject, valueFor
 } from '../js/objectHelpers'
 
 const assert = require('assert')
@@ -37,6 +37,25 @@ export class TestObjectHelpers extends TestCase {
     assert(hasProperties(o, ['a']) === true)
     assert(hasProperties(o, ['a', 'b']) === true)
     assert(hasProperties(o, ['a', 'b', 'ab']) === false)
+  }
+
+  testValueFor() {
+
+    const object = {
+      toto: {
+        tutu: {
+          1: 'oui',
+          '2': null
+        }
+      }
+    }
+
+    assert(valueFor(object, ['toto', 'tutu', '1']) === 'oui', 1)
+    assert(valueFor(object, ['toto', 'tutu', 1]) === 'oui', 2)
+    assert(valueFor(object, ['toto', 'tutu', 2], 'non') === null, 3)
+    assert(valueFor(object, ['toto', 'a', 2], 'non') === 'non', 4)
+    assert(valueFor(object, ['toto', 'a', 2]) === null, 5)
+
   }
 }
 

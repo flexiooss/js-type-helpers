@@ -1,6 +1,8 @@
 import {
+  assertType,
   isObject,
-  isUndefined
+  isUndefined,
+  isArray
 } from '@flexio-oss/assert'
 
 /**
@@ -134,4 +136,33 @@ export const deepMerge = (target, source) => {
   }
 
   return target
+}
+
+/**
+
+ * @param {Object} object
+ * @param {Array.<string>} path
+ * @param {*} [defaultValue=null]
+ * @returns {*}
+ */
+export const valueFor = (object, path, defaultValue = null) => {
+  assertType(
+    isObject(object),
+    'valueFor: `object` should be an Object'
+  )
+  assertType(
+    isArray(path),
+    'valueFor: `path` should be an Array'
+  )
+  let ret = object
+
+  do {
+    let key = path.shift()
+    if (ret[key] !== undefined && key in ret) {
+      ret = ret[key]
+    } else {
+      return defaultValue
+    }
+  } while (path.length)
+  return ret
 }
