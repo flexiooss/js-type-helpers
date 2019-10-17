@@ -2,9 +2,8 @@ import {
   assertType,
   isObject,
   isUndefined,
-  isArray
+  isArray, isNull, isNumber, isString
 } from '@flexio-oss/assert'
-import {isNull, isNumber, isString} from '../../../assert'
 
 /**
  *
