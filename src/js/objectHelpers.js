@@ -4,7 +4,7 @@ import {
   isUndefined,
   isArray
 } from '@flexio-oss/assert'
-import {isNull} from '../../../assert'
+import {isNull, isNumber, isString} from '../../../assert'
 
 /**
  *
@@ -146,11 +146,49 @@ export const deepMerge = (target, source) => {
  * @param {*} [defaultValue=null]
  * @returns {*}
  */
-export const valueFor = (object, path, defaultValue = null) => {
+export const deepKeyResolverByPath = (object, path, defaultValue = null) => {
   if (isNull(object)) {
     return defaultValue
   }
-  
+
+  assertType(
+    isObject(object),
+    'deepKeyResolverByPath: `object` should be an Object'
+  )
+  assertType(
+    isArray(path),
+    'deepKeyResolverByPath: `path` should be an Array'
+  )
+  let ret = object
+
+  do {
+    let key = path.shift()
+    assertType(
+      isString(key) || isNumber(key),
+      'deepKeyResolverByPath: `key` should be a string or number'
+    )
+    if (ret[key] !== undefined && key in ret) {
+      ret = ret[key]
+    } else {
+      return defaultValue
+    }
+  } while (path.length)
+  return ret
+}
+
+/**
+ *
+ * @param {?Object} object
+ * @param {Array.<string>} path
+ * @param {*} value
+ * @return {?Object}
+ */
+export const deepKeyAssignerByPath = (object, path, value) => {
+
+  if (isNull(object)) {
+    return null
+  }
+
   assertType(
     isObject(object),
     'valueFor: `object` should be an Object'
@@ -159,15 +197,25 @@ export const valueFor = (object, path, defaultValue = null) => {
     isArray(path),
     'valueFor: `path` should be an Array'
   )
-  let ret = object
 
-  do {
-    let key = path.shift()
-    if (ret[key] !== undefined && key in ret) {
-      ret = ret[key]
-    } else {
-      return defaultValue
+  if (path.length === 0) {
+    return object
+  }
+
+  let key = path.shift()
+  assertType(
+    isString(key) || isNumber(key),
+    'deepKeyAssignerByPath: `key` should be a string or number'
+  )
+  if (path.length === 0) {
+
+    object[key] = value
+    return object
+  } else {
+    if (!isObject(object[key])) {
+      object[key] = {}
     }
-  } while (path.length)
-  return ret
+
+    return deepKeyAssignerByPath(object[key], path, value)
+  }
 }

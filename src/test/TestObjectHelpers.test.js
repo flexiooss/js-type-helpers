@@ -2,8 +2,9 @@ import {TestCase} from 'code-altimeter-js'
 import {
   filterObject, hasProperties,
   maxKey,
-  sortObject, valueFor
+  sortObject, deepKeyResolverByPath, deepKeyAssignerByPath
 } from '../js/objectHelpers'
+import {deepKeyAssigner} from '../../../js-generator-helpers'
 
 const assert = require('assert')
 
@@ -39,7 +40,7 @@ export class TestObjectHelpers extends TestCase {
     assert(hasProperties(o, ['a', 'b', 'ab']) === false)
   }
 
-  testValueFor() {
+  testDeepKeyResolverByPath() {
 
     const object = {
       toto: {
@@ -50,12 +51,47 @@ export class TestObjectHelpers extends TestCase {
       }
     }
 
-    assert(valueFor(object, ['toto', 'tutu', '1']) === 'oui', 1)
-    assert(valueFor(object, ['toto', 'tutu', 1]) === 'oui', 2)
-    assert(valueFor(object, ['toto', 'tutu', 2], 'non') === null, 3)
-    assert(valueFor(object, ['toto', 'a', 2], 'non') === 'non', 4)
-    assert(valueFor(object, ['toto', 'a', 2]) === null, 5)
+    assert(deepKeyResolverByPath(object, ['toto', 'tutu', '1']) === 'oui', 1)
+    assert(deepKeyResolverByPath(object, ['toto', 'tutu', 1]) === 'oui', 2)
+    assert(deepKeyResolverByPath(object, ['toto', 'tutu', 2], 'non') === null, 3)
+    assert(deepKeyResolverByPath(object, ['toto', 'a', 2], 'non') === 'non', 4)
+    assert(deepKeyResolverByPath(object, ['toto', 'a', 2]) === null, 5)
 
+  }
+
+  testDeepKeyAssignerByPath() {
+    let o = {
+      'a': {
+        'a1': 1
+      },
+      'b': 'plok'
+    }
+
+    deepKeyAssignerByPath(o, ['c'], 42)
+    console.log(o)
+
+    assert(o['c'] === 42, 1)
+
+    deepKeyAssignerByPath(o, ['a', 'b'], null)
+    assert(o['a']['b'] === null, 2)
+
+    deepKeyAssignerByPath(o, ['a', 'a2', 'x'], false)
+    assert(o['a']['a2']['x'] === false, 3)
+
+    assert.deepStrictEqual(
+      o,
+      {
+        'a': {
+          'a1': 1,
+          'a2': {
+            'x': false
+          },
+          'b': null
+        },
+        'b': 'plok',
+        'c': 42
+      }, 4
+    )
   }
 }
 
