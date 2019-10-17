@@ -4,7 +4,6 @@ import {
   maxKey,
   sortObject, deepKeyResolverByPath, deepKeyAssignerByPath
 } from '../js/objectHelpers'
-import {deepKeyAssigner} from '../../../js-generator-helpers'
 
 const assert = require('assert')
 
