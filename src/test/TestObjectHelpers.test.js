@@ -91,6 +91,29 @@ export class TestObjectHelpers extends TestCase {
         'c': 42
       }, 4
     )
+
+    assert.deepStrictEqual(
+      deepKeyAssignerByPath(o, ['a', 'a2', 'z'], 'z'),
+      {
+        'a': {
+          'a1': 1,
+          'a2': {
+            'x': false,
+            'z': 'z'
+          },
+          'b': null
+        },
+        'b': 'plok',
+        'c': 42
+      }, 5
+    )
+
+    assert.deepStrictEqual(
+      deepKeyAssignerByPath({}, ['a'], 'z'),
+      {
+        'a': 'z'
+      }, 6
+    )
   }
 }
 

@@ -180,12 +180,17 @@ export const deepKeyResolverByPath = (object, path, defaultValue = null) => {
  * @param {?Object} object
  * @param {Array.<string>} path
  * @param {*} value
+ * @param {?Object} [objectAll=null]
  * @return {?Object}
  */
-export const deepKeyAssignerByPath = (object, path, value) => {
+export const deepKeyAssignerByPath = (object, path, value, objectAll = null) => {
 
   if (isNull(object)) {
     return null
+  }
+
+  if (isNull(objectAll)) {
+    objectAll = object
   }
 
   assertType(
@@ -197,8 +202,14 @@ export const deepKeyAssignerByPath = (object, path, value) => {
     'valueFor: `path` should be an Array'
   )
 
+  assertType(
+    isNull(objectAll) || isObject(objectAll),
+    'valueFor: `objectAll` should be an Object or Null'
+  )
+
   if (path.length === 0) {
-    return object
+    return objectAll
+
   }
 
   let key = path.shift()
@@ -209,12 +220,13 @@ export const deepKeyAssignerByPath = (object, path, value) => {
   if (path.length === 0) {
 
     object[key] = value
-    return object
+    return objectAll
+
   } else {
     if (!isObject(object[key])) {
       object[key] = {}
     }
 
-    return deepKeyAssignerByPath(object[key], path, value)
+    return deepKeyAssignerByPath(object[key], path, value, objectAll)
   }
 }
