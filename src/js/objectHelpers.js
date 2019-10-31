@@ -2,7 +2,7 @@ import {
   assertType,
   isObject,
   isUndefined,
-  isArray, isNull, isNumber, isString
+  isArray, isNull, isNumber, isString,isStrictObject
 } from '@flexio-oss/assert'
 
 /**
@@ -126,10 +126,10 @@ export const deepMerge = (target, source) => {
     const sourceValue = source[k]
     const targetValue = target[k]
 
-    if (isObject(sourceValue)) {
+    if (isStrictObject(sourceValue)) {
       target[k] = (!isUndefined(targetValue)) ? deepMerge(isObject(targetValue) ? targetValue : {}, cloneWithJsonMethod(sourceValue)) : cloneWithJsonMethod(sourceValue)
-    } else if (Array.isArray(sourceValue)) {
-      target[k] = (Array.isArray(targetValue)) ? [...new Set(targetValue.concat(cloneWithJsonMethod(sourceValue)))] : cloneWithJsonMethod(sourceValue)
+    } else if (isArray(sourceValue)) {
+      target[k] = (isArray(targetValue)) ? [...new Set(targetValue.concat(cloneWithJsonMethod(sourceValue)))] : cloneWithJsonMethod(sourceValue)
     } else {
       target[k] = sourceValue
     }
