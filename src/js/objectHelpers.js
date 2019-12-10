@@ -1,6 +1,8 @@
 import {
+  assertType,
   isObject,
-  isUndefined
+  isUndefined,
+  isArray, isNull, isNumber, isString,isStrictObject
 } from '@flexio-oss/assert'
 
 /**
@@ -124,14 +126,107 @@ export const deepMerge = (target, source) => {
     const sourceValue = source[k]
     const targetValue = target[k]
 
-    if (isObject(sourceValue)) {
+    if (isStrictObject(sourceValue)) {
       target[k] = (!isUndefined(targetValue)) ? deepMerge(isObject(targetValue) ? targetValue : {}, cloneWithJsonMethod(sourceValue)) : cloneWithJsonMethod(sourceValue)
-    } else if (Array.isArray(sourceValue)) {
-      target[k] = (Array.isArray(targetValue)) ? [...new Set(targetValue.concat(cloneWithJsonMethod(sourceValue)))] : cloneWithJsonMethod(sourceValue)
+    } else if (isArray(sourceValue)) {
+      target[k] = (isArray(targetValue)) ? [...new Set(targetValue.concat(cloneWithJsonMethod(sourceValue)))] : cloneWithJsonMethod(sourceValue)
     } else {
       target[k] = sourceValue
     }
   }
 
   return target
+}
+
+/**
+
+ * @param {Object} object
+ * @param {Array.<string>} path
+ * @param {*} [defaultValue=null]
+ * @returns {*}
+ */
+export const deepKeyResolverByPath = (object, path, defaultValue = null) => {
+  if (isNull(object)) {
+    return defaultValue
+  }
+
+  assertType(
+    isObject(object),
+    'deepKeyResolverByPath: `object` should be an Object'
+  )
+  assertType(
+    isArray(path),
+    'deepKeyResolverByPath: `path` should be an Array'
+  )
+  let ret = object
+
+  do {
+    let key = path.shift()
+    assertType(
+      isString(key) || isNumber(key),
+      'deepKeyResolverByPath: `key` should be a string or number'
+    )
+    if (ret[key] !== undefined && key in ret) {
+      ret = ret[key]
+    } else {
+      return defaultValue
+    }
+  } while (path.length)
+  return ret
+}
+
+/**
+ *
+ * @param {?Object} object
+ * @param {Array.<string>} path
+ * @param {*} value
+ * @param {?Object} [objectAll=null]
+ * @return {?Object}
+ */
+export const deepKeyAssignerByPath = (object, path, value, objectAll = null) => {
+
+  if (isNull(object)) {
+    return null
+  }
+
+  if (isNull(objectAll)) {
+    objectAll = object
+  }
+
+  assertType(
+    isObject(object),
+    'valueFor: `object` should be an Object'
+  )
+  assertType(
+    isArray(path),
+    'valueFor: `path` should be an Array'
+  )
+
+  assertType(
+    isNull(objectAll) || isObject(objectAll),
+    'valueFor: `objectAll` should be an Object or Null'
+  )
+
+  if (path.length === 0) {
+    return objectAll
+
+  }
+
+  let key = path.shift()
+  assertType(
+    isString(key) || isNumber(key),
+    'deepKeyAssignerByPath: `key` should be a string or number'
+  )
+  if (path.length === 0) {
+
+    object[key] = value
+    return objectAll
+
+  } else {
+    if (!isObject(object[key])) {
+      object[key] = {}
+    }
+
+    return deepKeyAssignerByPath(object[key], path, value, objectAll)
+  }
 }
