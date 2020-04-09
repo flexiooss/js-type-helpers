@@ -2,10 +2,12 @@ import {TestCase} from 'code-altimeter-js'
 import {
   filterObject, hasProperties,
   maxKey,
-  sortObject, deepKeyResolverByPath, deepKeyAssignerByPath
+  sortObject, deepKeyResolverByPath, deepKeyAssignerByPath, deepMerge
 } from '../js/objectHelpers'
 
+
 const assert = require('assert')
+
 
 export class TestObjectHelpers extends TestCase {
   testSortObect() {
@@ -115,6 +117,57 @@ export class TestObjectHelpers extends TestCase {
       }, 6
     )
   }
+
+  testDeepMerge() {
+    let a = {
+      a: 'toto',
+      b: {
+        b1: 'tutu',
+        b2: ['a', 'b'],
+        b3: {
+          b11: 'tata'
+        }
+      }
+    }
+    let b = {
+      a: 'truc',
+      b: {
+        b2: ['a', 'truc'],
+        b3: {
+          b11: 'truc',
+          b12: 'truc'
+        }
+      },
+      c: 'truc',
+      d: {
+        d1: {
+          d11: 'truc'
+        }
+      }
+    }
+    const expected = {
+      a: 'truc',
+      b:
+        {
+          b1: 'tutu',
+          b2: ['a', 'b', 'truc'],
+          b3: {
+            b11: 'truc',
+            b12: 'truc'
+          }
+        },
+      c: 'truc',
+      d: {d1: {d11: 'truc'}}
+    }
+
+    assert.deepStrictEqual(
+      deepMerge(a,b),
+      expected,
+      'object a should be deep merged with object b'
+    )
+
+  }
 }
+
 
 runTest(TestObjectHelpers)
